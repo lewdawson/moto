@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import json
+import uuid
 
 from moto.core.responses import BaseResponse
 from .models import glue_backend
@@ -238,3 +239,6 @@ class GlueResponse(BaseResponse):
             out["Errors"] = errors_output
 
         return json.dumps(out)
+
+    def start_job_run(self):
+        return json.dumps({'JobRunId': uuid.uuid4()})
