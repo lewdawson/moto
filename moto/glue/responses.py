@@ -241,4 +241,4 @@ class GlueResponse(BaseResponse):
         return json.dumps(out)
 
     def start_job_run(self):
-        return json.dumps({'JobRunId': uuid.uuid4()})
+        return json.dumps({'JobRunId': str(uuid.uuid4())})
