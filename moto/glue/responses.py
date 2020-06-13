@@ -241,4 +241,32 @@ class GlueResponse(BaseResponse):
         return json.dumps(out)
 
     def start_job_run(self):
-        return json.dumps({'JobRunId': str(uuid.uuid4())})
+        return json.dumps({"JobRunId": str(uuid.uuid4())})
+
+    def create_crawler(self):
+        name = self.parameters.get("Name")
+        role = self.parameters.get("Role")
+        targets = self.parameters.get("Targets")
+        print(self.parameters.get("State"))
+        self.glue_backend.create_crawler(name, role, targets)
+        return ""
+
+    def get_crawler(self):
+        name = self.parameters.get("Name")
+        crawler = self.glue_backend.get_crawler(name)
+        return json.dumps({
+            "Crawler": {
+                "Name": crawler.name,
+                "Role": crawler.role,
+                "Targets": crawler.targets,
+                "State": crawler.state,
+                "CreationTime": crawler.creation_time,
+                "LastUpdated": crawler.last_updated,
+                "LastCrawl": crawler.last_crawl,
+            },
+        })
+
+    def start_crawler(self):
+        name = self.parameters.get("Name")
+        self.glue_backend.start_crawler(name)
+        return ""

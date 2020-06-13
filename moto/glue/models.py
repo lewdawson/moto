@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import time
+from datetime import datetime
 
 from moto.core import BaseBackend, BaseModel
 from moto.compat import OrderedDict
@@ -13,12 +14,13 @@ from .exceptions import (
     PartitionAlreadyExistsException,
     PartitionNotFoundException,
     VersionNotFoundException,
-)
+    AlreadyExistsException, EntityNotFoundException)
 
 
 class GlueBackend(BaseBackend):
     def __init__(self):
         self.databases = OrderedDict()
+        self.crawlers = OrderedDict()
 
     def create_database(self, database_name):
         if database_name in self.databases:
@@ -62,6 +64,27 @@ class GlueBackend(BaseBackend):
         except KeyError:
             raise TableNotFoundException(table_name)
         return {}
+
+    def create_crawler(self, name, role, targets):
+        crawler = FakeCrawler(name, role, targets)
+
+        if crawler.name in self.crawlers:
+            raise AlreadyExistsException(name)
+
+        self.crawlers[name] = crawler
+
+        return crawler
+
+    def get_crawler(self, name):
+        try:
+            return self.crawlers[name]
+        except KeyError:
+            raise EntityNotFoundException(name)
+
+    def start_crawler(self, name):
+        crawler = self.get_crawler(name)
+        crawler.start_crawl()
+        return crawler
 
 
 class FakeDatabase(BaseModel):
@@ -137,6 +160,29 @@ class FakeTable(BaseModel):
             del self.partitions[str(values)]
         except KeyError:
             raise PartitionNotFoundException()
+
+
+class FakeCrawler(BaseModel):
+    def __init__(self, name, role, targets):
+        self.name = name
+        self.role = role
+        self.targets = targets
+
+        self.creation_time = datetime.utcnow()
+        self.last_updated = self.creation_time
+        self.state = 'READY'
+        self.last_crawl = None
+
+    def start_crawl(self):
+        self.last_updated = datetime.utcnow()
+        self.last_crawl = {
+            'Status': 'SUCCEEDED',
+            'ErrorMessage': None,
+            'LogGroup': 'string',
+            'LogStream': 'string',
+            'MessagePrefix': 'string',
+            'StartTime': self.last_updated,
+        }
 
 
 class FakePartition(BaseModel):
