@@ -260,8 +260,8 @@ class GlueResponse(BaseResponse):
                 "Role": crawler.role,
                 "Targets": crawler.targets,
                 "State": crawler.state,
-                "CreationTime": crawler.creation_time,
-                "LastUpdated": crawler.last_updated,
+                "CreationTime": str(crawler.creation_time),
+                "LastUpdated": str(crawler.last_updated),
                 "LastCrawl": crawler.last_crawl,
             },
         })
