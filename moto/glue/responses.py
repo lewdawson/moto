@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import json
 import uuid
+from datetime import datetime
 
 from moto.core.responses import BaseResponse
 from .models import glue_backend
@@ -254,17 +255,18 @@ class GlueResponse(BaseResponse):
     def get_crawler(self):
         name = self.parameters.get("Name")
         crawler = self.glue_backend.get_crawler(name)
+
         return json.dumps({
             "Crawler": {
                 "Name": crawler.name,
                 "Role": crawler.role,
                 "Targets": crawler.targets,
                 "State": crawler.state,
-                "CreationTime": str(crawler.creation_time),
-                "LastUpdated": str(crawler.last_updated),
+                "CreationTime": crawler.creation_time,
+                "LastUpdated": crawler.last_updated,
                 "LastCrawl": crawler.last_crawl,
             },
-        })
+        }, default=lambda o: str(o))
 
     def start_crawler(self):
         name = self.parameters.get("Name")

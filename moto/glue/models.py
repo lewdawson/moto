@@ -83,7 +83,7 @@ class GlueBackend(BaseBackend):
 
     def start_crawler(self, name):
         crawler = self.get_crawler(name)
-        crawler.start_crawl()
+        crawler.start_crawler()
         return crawler
 
 
@@ -173,7 +173,7 @@ class FakeCrawler(BaseModel):
         self.state = 'READY'
         self.last_crawl = None
 
-    def start_crawl(self):
+    def start_crawler(self):
         self.last_updated = datetime.utcnow()
         self.last_crawl = {
             'Status': 'SUCCEEDED',
