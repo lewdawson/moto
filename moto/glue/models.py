@@ -168,13 +168,13 @@ class FakeCrawler(BaseModel):
         self.role = role
         self.targets = targets
 
-        self.creation_time = datetime.utcnow()
+        self.creation_time = datetime.now()
         self.last_updated = self.creation_time
         self.state = 'READY'
         self.last_crawl = None
 
     def start_crawler(self):
-        self.last_updated = datetime.utcnow()
+        self.last_updated = datetime.now()
         self.last_crawl = {
             'Status': 'SUCCEEDED',
             'ErrorMessage': None,
